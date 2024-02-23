@@ -19,7 +19,7 @@ DrBruisinJuiceIntroEssentialsAudioProcessor::DrBruisinJuiceIntroEssentialsAudioP
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), myAvpts(*this, nullptr,"myParamaters", myCreateParamaterLayout())
 #endif
 {
 }
@@ -27,6 +27,18 @@ DrBruisinJuiceIntroEssentialsAudioProcessor::DrBruisinJuiceIntroEssentialsAudioP
 DrBruisinJuiceIntroEssentialsAudioProcessor::~DrBruisinJuiceIntroEssentialsAudioProcessor()
 {
 }
+
+juce::AudioProcessorValueTreeState::ParameterLayout DrBruisinJuiceIntroEssentialsAudioProcessor::myCreateParamaterLayout()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> myParamsVector;
+
+    auto myGainParam = std::make_unique<juce::AudioParameterFloat>("gain", "Gain", -24.0, 24.0, 0.0);
+
+    myParamsVector.push_back(std::move(myGainParam));
+
+    return { myParamsVector.begin(), myParamsVector.end() };
+}
+    
 
 //==============================================================================
 const juce::String DrBruisinJuiceIntroEssentialsAudioProcessor::getName() const
@@ -139,7 +151,7 @@ void DrBruisinJuiceIntroEssentialsAudioProcessor::processBlock (juce::AudioBuffe
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-
+    // myCouldUseBufferButdsp::AudioBlock below is better to use as contect for other dsp modules eg chorus etc
     //for (int channel = 0; channel < totalNumInputChannels; ++channel)
 
     //{
@@ -148,14 +160,21 @@ void DrBruisinJuiceIntroEssentialsAudioProcessor::processBlock (juce::AudioBuffe
     //    /*for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     //        channelData[sample] *= 4;*/
 
+    float dbGain = *myAvpts.getRawParameterValue("gain");
+    float rawGain = juce::Decibels::decibelsToGain(dbGain);    // same as the calculation std::pow(10, (dbGain/20))
+    
+    //my DSP Block
     juce::dsp::AudioBlock<float> myBlock(buffer);
 
     for (int channel = 0; channel < myBlock.getNumChannels(); ++channel)
     {
         auto* channelData = myBlock.getChannelPointer(channel);
 
-        for (int sample = 0; sample <  myBlock.getNumSamples(); ++sample)
-            channelData[sample] *= 4;
+        for (int sample = 0; sample < myBlock.getNumSamples(); ++sample)
+            channelData[sample] *= rawGain;
+    
+        //#include <iostream>
+        // std::cout << rawGain;
     }
 }
 
@@ -167,7 +186,8 @@ bool DrBruisinJuiceIntroEssentialsAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* DrBruisinJuiceIntroEssentialsAudioProcessor::createEditor()
 {
-    return new DrBruisinJuiceIntroEssentialsAudioProcessorEditor (*this);
+    //return new DrBruisinJuiceIntroEssentialsAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor(*this);
 }
 
 //==============================================================================

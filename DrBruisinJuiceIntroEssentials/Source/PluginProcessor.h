@@ -53,7 +53,10 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::AudioProcessorValueTreeState myAvpts;
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrBruisinJuiceIntroEssentialsAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DrBruisinJuiceIntroEssentialsAudioProcessor)
+
+        juce::AudioProcessorValueTreeState::ParameterLayout myCreateParamaterLayout();
 };
