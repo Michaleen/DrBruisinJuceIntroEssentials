@@ -19,26 +19,47 @@ DrBruisinJuiceIntroEssentialsAudioProcessor::DrBruisinJuiceIntroEssentialsAudioP
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), myAvpts(*this, nullptr,"myParamaters", myCreateParamaterLayout())
+                       ), myApvts(*this, nullptr,"myParamaters", myCreateParamaterLayout())
 #endif
 {
+    myApvts.addParameterListener("gain", this);
+    myApvts.addParameterListener("phase", this);
 }
 
 DrBruisinJuiceIntroEssentialsAudioProcessor::~DrBruisinJuiceIntroEssentialsAudioProcessor()
 {
+    myApvts.removeParameterListener("gain", this);
+    myApvts.removeParameterListener("phase", this);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout DrBruisinJuiceIntroEssentialsAudioProcessor::myCreateParamaterLayout()
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> myParamsVector;
 
+    juce::StringArray myStringArrayOfChoices = { "myCompressor","myEQ", "MyGoodnessGacious" };
     auto myGainParam = std::make_unique<juce::AudioParameterFloat>("gain", "Gain", -24.0, 24.0, 0.0);
-
+    auto myPhaseParam = std::make_unique<juce::AudioParameterBool>("phase", "Phase", false);
+    auto myChoicesParam = std::make_unique<juce::AudioParameterChoice>("choice", "Choice", myStringArrayOfChoices, 3);
     myParamsVector.push_back(std::move(myGainParam));
-
-    return { myParamsVector.begin(), myParamsVector.end() };
-}
+    myParamsVector.push_back(std::move(myPhaseParam));
+    myParamsVector.push_back(std::move(myChoicesParam));
     
+    return { myParamsVector.begin(), myParamsVector.end() };
+} 
+    
+void  DrBruisinJuiceIntroEssentialsAudioProcessor::parameterChanged(const juce::String& parameterID, float newValue)
+{
+    if (parameterID == "gain")
+    {
+        rawGain = juce::Decibels::decibelsToGain(newValue);
+        DBG("Gain is now:" << newValue);
+    }
+    if (parameterID == "phase")
+    {
+        isPhased = newValue;
+        DBG("Phase is now " << newValue);
+    }
+}
 
 //==============================================================================
 const juce::String DrBruisinJuiceIntroEssentialsAudioProcessor::getName() const
@@ -151,7 +172,7 @@ void DrBruisinJuiceIntroEssentialsAudioProcessor::processBlock (juce::AudioBuffe
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // myCouldUseBufferButdsp::AudioBlock below is better to use as contect for other dsp modules eg chorus etc
+    // Mic: Could Use Buffer But dsp::AudioBlock below is better to use as contect for other dsp modules eg chorus etc
     //for (int channel = 0; channel < totalNumInputChannels; ++channel)
 
     //{
@@ -160,8 +181,9 @@ void DrBruisinJuiceIntroEssentialsAudioProcessor::processBlock (juce::AudioBuffe
     //    /*for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
     //        channelData[sample] *= 4;*/
 
-    float dbGain = *myAvpts.getRawParameterValue("gain");
-    float rawGain = juce::Decibels::decibelsToGain(dbGain);    // same as the calculation std::pow(10, (dbGain/20))
+    //float dbGain = *myApvts.getRawParameterValue("gain");
+    //float rawGain = juce::Decibels::decibelsToGain(dbGain);    // same as the calculation std::pow(10, (dbGain/20))
+    //bool isPhased = *myApvts.getRawParameterValue("phase");
     
     //my DSP Block
     juce::dsp::AudioBlock<float> myBlock(buffer);
@@ -171,8 +193,14 @@ void DrBruisinJuiceIntroEssentialsAudioProcessor::processBlock (juce::AudioBuffe
         auto* channelData = myBlock.getChannelPointer(channel);
 
         for (int sample = 0; sample < myBlock.getNumSamples(); ++sample)
+        {
             channelData[sample] *= rawGain;
-    
+            if (isPhased)
+            {
+                channelData[sample] *= -1;
+            }
+        }
+     
         //#include <iostream>
         // std::cout << rawGain;
     }

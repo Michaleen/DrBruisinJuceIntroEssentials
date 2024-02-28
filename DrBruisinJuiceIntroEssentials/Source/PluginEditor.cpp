@@ -2,7 +2,7 @@
   ==============================================================================
 
     This file contains the basic framework code for a JUCE plugin editor.
-
+//C:\Users\Mic Dev\JUCE\extras\AudioPluginHost\Builds\VisualStudio2019\x64\Debug\App\AudioPluginHost.exe
   ==============================================================================
 */
 

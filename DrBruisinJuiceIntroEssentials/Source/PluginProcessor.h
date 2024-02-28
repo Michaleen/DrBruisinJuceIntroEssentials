@@ -13,7 +13,7 @@
 //==============================================================================
 /**
 */
-class DrBruisinJuiceIntroEssentialsAudioProcessor  : public juce::AudioProcessor
+class DrBruisinJuiceIntroEssentialsAudioProcessor  : public juce::AudioProcessor, juce::AudioProcessorValueTreeState::Listener
 {
 public:
     //==============================================================================
@@ -52,11 +52,20 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-
-    juce::AudioProcessorValueTreeState myAvpts;
+    
+    //==  VALUE TREES ==============================================================
+    juce::AudioProcessorValueTreeState myApvts;
 private:
+    
+    float rawGain = 1.0;
+    bool isPhased = false;
+    //==  PARAMETERS ===============================================================
+    juce::AudioProcessorValueTreeState::ParameterLayout myCreateParamaterLayout();
+    void parameterChanged(const juce::String& parameterID, float newValue) override;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DrBruisinJuiceIntroEssentialsAudioProcessor)
 
-        juce::AudioProcessorValueTreeState::ParameterLayout myCreateParamaterLayout();
+
+
 };
