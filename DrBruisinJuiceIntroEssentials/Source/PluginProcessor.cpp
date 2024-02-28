@@ -126,8 +126,8 @@ void DrBruisinJuiceIntroEssentialsAudioProcessor::changeProgramName (int index, 
 //==============================================================================
 void DrBruisinJuiceIntroEssentialsAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    isPhased = *myApvts.getRawParameterValue("phase");
+    rawGain = juce::Decibels::decibelsToGain(static_cast<float>(*myApvts.getRawParameterValue("gain")));
 }
 
 void DrBruisinJuiceIntroEssentialsAudioProcessor::releaseResources()
@@ -224,12 +224,27 @@ void DrBruisinJuiceIntroEssentialsAudioProcessor::getStateInformation (juce::Mem
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    
+    //SAVE MY PARAMS
+    juce::MemoryOutputStream myOutputStream(destData, false);
+    myApvts.state.writeToStream(myOutputStream);
 }
 
 void DrBruisinJuiceIntroEssentialsAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+
+    //RECALL MY PARAMS
+    auto mySavedTree = juce::ValueTree::readFromData(data, size_t(sizeInBytes));
+
+    if (mySavedTree.isValid())
+    {
+        myApvts.state = mySavedTree;
+        isPhased = *myApvts.getRawParameterValue("phase");
+        rawGain = juce::Decibels::decibelsToGain(static_cast<float>(*myApvts.getRawParameterValue("gain")));
+    }
+
 }
 
 //==============================================================================
