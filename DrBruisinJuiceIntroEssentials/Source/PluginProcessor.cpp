@@ -215,7 +215,7 @@ bool DrBruisinJuiceIntroEssentialsAudioProcessor::hasEditor() const
 juce::AudioProcessorEditor* DrBruisinJuiceIntroEssentialsAudioProcessor::createEditor()
 {
     return new DrBruisinJuiceIntroEssentialsAudioProcessorEditor (*this);
-    //return new juce::GenericAudioProcessorEditor(*this);
+    //return new juce::GenericAudioProcessorEditor(*this);  
 }
 
 //==============================================================================
