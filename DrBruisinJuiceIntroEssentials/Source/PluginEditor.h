@@ -33,6 +33,8 @@ private:
     juce::TextButton myButton;
     juce::ToggleButton myToggleButton;
     juce::Label myDialLabel;
+
+    void initMyDial();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DrBruisinJuiceIntroEssentialsAudioProcessorEditor)
 };

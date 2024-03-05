@@ -13,13 +13,8 @@
 DrBruisinJuiceIntroEssentialsAudioProcessorEditor::DrBruisinJuiceIntroEssentialsAudioProcessorEditor (DrBruisinJuiceIntroEssentialsAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {   
+    initMyDial();
     
-    addAndMakeVisible (myDial);
-    myDial.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-    myDial.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 72, 32);
-    myDial.setRange(-24.0, 24, 0.1);
-    myDial.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::whitesmoke.withAlpha(0.4f));
-    myDial.setDoubleClickReturnValue(true, 0.0);
 
     addAndMakeVisible(myButton);
     myButton.setButtonText("myButtony");
@@ -66,6 +61,17 @@ void DrBruisinJuiceIntroEssentialsAudioProcessorEditor::paint (juce::Graphics& g
     g.drawFittedText ("Micaliscious", getLocalBounds(), juce::Justification::centredTop, 1);
 }
 
+void DrBruisinJuiceIntroEssentialsAudioProcessorEditor::initMyDial()
+{
+    addAndMakeVisible(myDial);
+    myDial.setSliderStyle(juce::Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    myDial.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 72, 32);
+    myDial.setRange(-24.0, 24, 0.1);
+    myDial.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colours::whitesmoke.withAlpha(0.4f));
+    myDial.setDoubleClickReturnValue(true, 0.0);
+}
+
+
 void DrBruisinJuiceIntroEssentialsAudioProcessorEditor::resized()
 {
     
@@ -77,7 +83,7 @@ void DrBruisinJuiceIntroEssentialsAudioProcessorEditor::resized()
 
     
     auto myLeftMargin = getWidth() * 0.02;
-    auto myTopMargin = getHeight() * 0.04;
+    auto myTopMargin = getHeight() * 0.20;
     auto myDialSize = getWidth() * 0.20;
     
     auto myTextBoxW = getWidth() * 0.10;
@@ -89,9 +95,9 @@ void DrBruisinJuiceIntroEssentialsAudioProcessorEditor::resized()
     myDial.setBounds(myLeftMargin, myTopMargin, myDialSize, myDialSize);
     myDial.setTextBoxStyle(juce::Slider::TextBoxBelow, false, myTextBoxW, myTextBoxH);
 
-    myButton.setBounds(myDial.getX() + myDial.getWidth() + myLeftMargin, myTopMargin * 2, myButtonWidth, myButtonHeight);
+    myButton.setBounds(myDial.getX() + myDial.getWidth() + myLeftMargin, myTopMargin * 1.2, myButtonWidth, myButtonHeight);
 
-    myToggleButton.setBounds(myDial.getX() + myDial.getWidth() * 2 + myLeftMargin, myTopMargin * 2, myButtonWidth, myButtonHeight);
+    myToggleButton.setBounds(myDial.getX() + myDial.getWidth() * 2 + myLeftMargin, myTopMargin * 1.2, myButtonWidth, myButtonHeight);
     myToggleButton.setButtonText("Toggler");
 }
 
